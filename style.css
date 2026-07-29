@@ -1,0 +1,995 @@
+/**
+ * ==========================================================================
+ * Canva 감성 아날로그 다이어리 - 메인 스타일시트 (style.css)
+ * 
+ * Design Concept:
+ * - Canva 다이어리 템플릿의 포근하고 감성적인 아날로그 노트 디테일
+ * - 파스텔톤 종이 질감 (#FAF6F0) 및 마스킹 테이프 오버레이
+ * - 감성 손글씨 및 고운 바탕체 Google Fonts 연동
+ * - 선택형 비밀번호 잠금 모달 디자인
+ * ==========================================================================
+ */
+
+:root {
+    /* 기본 폰트 패밀리 */
+    --font-heading: 'Gowun Batang', serif;
+    --font-body: 'Gowun Dodum', sans-serif;
+    --font-handwriting: 'Gamja Flower', cursive;
+
+    /* 핑크 테마 (기본) */
+    --bg-main: #fbf7f4;
+    --card-bg: #ffffff;
+    --paper-texture: #faf6f0;
+    --accent-main: #ff85a1;
+    --accent-soft: #ffe4e9;
+    --accent-border: #f8c8d2;
+    --text-primary: #4a3e3d;
+    --text-secondary: #8c7b79;
+    --shadow-soft: 0 12px 32px rgba(255, 133, 161, 0.12);
+    --shadow-card: 0 8px 24px rgba(74, 62, 61, 0.08);
+}
+
+/* 파스텔 테마 변경 (data-theme) */
+body[data-theme="yellow"] {
+    --bg-main: #fdfbf7;
+    --accent-main: #f4b41a;
+    --accent-soft: #fff6d6;
+    --accent-border: #f7e3a1;
+    --shadow-soft: 0 12px 32px rgba(244, 180, 26, 0.12);
+}
+
+body[data-theme="blue"] {
+    --bg-main: #f5f9fc;
+    --accent-main: #5eb0e5;
+    --accent-soft: #e2f2ff;
+    --accent-border: #b8e0ff;
+    --shadow-soft: 0 12px 32px rgba(94, 176, 229, 0.12);
+}
+
+/* 리셋 & 기본 스타일 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 16px;
+    background-image: 
+        radial-gradient(var(--accent-soft) 1px, transparent 1px),
+        radial-gradient(var(--accent-soft) 1px, var(--bg-main) 1px);
+    background-size: 32px 32px;
+    background-position: 0 0, 16px 16px;
+    transition: background-color 0.4s ease;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 720px;
+    position: relative;
+}
+
+/* 바인더 스프링 디테일 */
+.binder-rings {
+    position: absolute;
+    top: 28px;
+    left: -14px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    z-index: 10;
+}
+
+.binder-rings .ring {
+    width: 28px;
+    height: 14px;
+    background: linear-gradient(135deg, #d8d0ce, #ffffff, #b5aba8);
+    border-radius: 8px;
+    box-shadow: 2px 3px 6px rgba(0,0,0,0.2);
+}
+
+/* 마스킹 테이프 장식 오브젝트 */
+.tape-sticker {
+    position: absolute;
+    height: 26px;
+    width: 110px;
+    background-color: var(--accent-soft);
+    opacity: 0.85;
+    transform: rotate(-3deg);
+    border-left: 2px stroke transparent;
+    border-right: 2px stroke transparent;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    z-index: 5;
+    pointer-events: none;
+}
+
+.tape-top-left {
+    top: -12px;
+    left: 40px;
+    transform: rotate(-4deg);
+}
+
+.tape-top-right {
+    top: -12px;
+    right: 40px;
+    transform: rotate(3deg);
+}
+
+.tape-calendar {
+    top: -12px;
+    right: 50%;
+    transform: translateX(50%) rotate(1deg);
+}
+
+.tape-note {
+    top: -12px;
+    left: 30px;
+    transform: rotate(-2deg);
+}
+
+/* ----------------------------------------------------------------------
+ * 1. Canva 감성 커버 화면 (Cover Screen)
+ * ---------------------------------------------------------------------- */
+.cover-screen {
+    position: relative;
+    width: 100%;
+}
+
+.cover-card {
+    background-color: var(--card-bg);
+    border: 2px solid var(--accent-border);
+    border-radius: 24px;
+    padding: 36px 28px;
+    box-shadow: var(--shadow-card), var(--shadow-soft);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 상단 상태 바 */
+.top-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.theme-selector-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--paper-texture);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--accent-border);
+}
+
+.theme-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: bold;
+}
+
+.btn-theme {
+    border: none;
+    background: transparent;
+    font-size: 0.82rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-theme.active, .btn-theme:hover {
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transform: scale(1.05);
+}
+
+.top-right-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-passcode-toggle {
+    background-color: var(--paper-texture);
+    border: 1px solid var(--accent-border);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-passcode-toggle:hover {
+    background-color: var(--accent-soft);
+    transform: translateY(-1px);
+}
+
+.btn-passcode-toggle.mini {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+}
+
+.db-status-badge {
+    font-size: 0.78rem;
+    background-color: var(--accent-soft);
+    color: var(--text-primary);
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-weight: bold;
+}
+
+/* 고양이 일러스트 */
+.cat-illustration-wrapper {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background-color: var(--accent-soft);
+    padding: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    border: 2px dashed var(--accent-main);
+}
+
+.cat-illustration {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.cover-ribbon {
+    display: inline-block;
+    background-color: var(--accent-soft);
+    color: var(--text-primary);
+    font-family: var(--font-handwriting);
+    font-size: 1.4rem;
+    padding: 6px 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--accent-border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.name-input-group {
+    background-color: var(--paper-texture);
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px dashed var(--accent-border);
+    margin-bottom: 20px;
+}
+
+.name-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.name-input {
+    width: 100%;
+    max-width: 280px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--accent-border);
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.name-input:focus {
+    border-color: var(--accent-main);
+}
+
+.cover-title {
+    font-family: var(--font-heading);
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.cover-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+    line-height: 1.6;
+}
+
+.btn-open-diary {
+    background-color: var(--accent-main);
+    color: #ffffff;
+    border: none;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-family: var(--font-heading);
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255, 133, 161, 0.4);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-open-diary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(255, 133, 161, 0.5);
+}
+
+/* ----------------------------------------------------------------------
+ * 2. 메인 화면 & 아날로그 다이어리 노트 속지 (Main Screen)
+ * ---------------------------------------------------------------------- */
+.main-screen {
+    position: relative;
+    width: 100%;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 24px;
+    background-color: var(--card-bg);
+    padding: 24px;
+    border-radius: 20px;
+    border: 2px solid var(--accent-border);
+    box-shadow: var(--shadow-card);
+}
+
+.header-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.btn-back-cover {
+    background-color: var(--paper-texture);
+    border: 1px solid var(--accent-border);
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+}
+
+.btn-back-cover:hover {
+    background-color: var(--accent-soft);
+}
+
+.badge {
+    background-color: var(--accent-soft);
+    color: var(--text-primary);
+    font-family: var(--font-handwriting);
+    font-size: 1.1rem;
+    padding: 4px 14px;
+    border-radius: 16px;
+}
+
+.main-title {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+}
+
+.sub-title {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* 📅 파스텔 마음 달력 카드 */
+.calendar-card {
+    position: relative;
+    background-color: var(--card-bg);
+    border: 2px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.calendar-title {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+}
+
+.btn-cal-nav, .btn-today {
+    background-color: var(--paper-texture);
+    border: 1px solid var(--accent-border);
+    padding: 4px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-cal-nav:hover, .btn-today:hover {
+    background-color: var(--accent-soft);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    border-bottom: 1px dashed var(--accent-border);
+    padding-bottom: 6px;
+}
+
+.weekday.sun { color: #ff6b6b; }
+.weekday.sat { color: #4d96ff; }
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.day-cell {
+    aspect-ratio: 1 / 1;
+    background-color: var(--paper-texture);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.day-cell:hover {
+    border-color: var(--accent-main);
+    transform: scale(1.05);
+}
+
+.day-cell.selected {
+    background-color: var(--accent-soft);
+    border: 2px solid var(--accent-main);
+    font-weight: bold;
+}
+
+.day-cell.today {
+    box-shadow: inset 0 0 0 2px var(--accent-main);
+}
+
+.day-cell.other-month {
+    opacity: 0.35;
+}
+
+.day-number {
+    font-size: 0.8rem;
+}
+
+.emoji-stamp {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+/* 선택된 날짜 배너 */
+.selected-date-banner {
+    background-color: var(--accent-soft);
+    padding: 10px 18px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--accent-border);
+}
+
+/* ✍️ 일기 작성 노트 속지 카드 (Journal Line Pattern) */
+.diary-card {
+    position: relative;
+    background-color: var(--paper-texture);
+    border: 2px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.input-label {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-sample {
+    background-color: #ffffff;
+    border: 1px solid var(--accent-border);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-sample:hover {
+    background-color: var(--accent-soft);
+}
+
+.char-counter {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* 노트 줄무늬 입력창 */
+textarea#diary-input {
+    width: 100%;
+    height: 180px;
+    padding: 12px;
+    border: 1.5px solid var(--accent-border);
+    border-radius: 14px;
+    background-color: #ffffff;
+    font-family: var(--font-handwriting);
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    resize: vertical;
+    outline: none;
+    background-image: repeating-linear-gradient(transparent, transparent 31px, var(--accent-soft) 31px, var(--accent-soft) 32px);
+    background-attachment: local;
+    transition: border-color 0.2s;
+}
+
+textarea#diary-input:focus {
+    border-color: var(--accent-main);
+}
+
+.voice-status {
+    background-color: var(--accent-soft);
+    padding: 8px 14px;
+    border-radius: 12px;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 14px;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-voice {
+    background-color: #ffffff;
+    border: 1.5px solid var(--accent-border);
+    color: var(--text-primary);
+}
+
+.btn-voice:hover {
+    background-color: var(--accent-soft);
+}
+
+.btn-analyze {
+    background-color: var(--accent-main);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(255, 133, 161, 0.3);
+}
+
+.btn-analyze:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 133, 161, 0.4);
+}
+
+.voice-guide-tip {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+}
+
+/* ✨ AI 답변 카드 */
+.response-card {
+    background-color: var(--card-bg);
+    border: 2px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+.response-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.response-title {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+}
+
+.sentiment-badge {
+    background-color: var(--accent-soft);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.ai-response-box {
+    background-color: var(--paper-texture);
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid var(--accent-border);
+    min-height: 120px;
+}
+
+.ai-placeholder {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 20px 0;
+}
+
+.placeholder-text {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.placeholder-sub {
+    font-size: 0.82rem;
+}
+
+.ai-loading {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--accent-soft);
+    border-top-color: var(--accent-main);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.ai-result {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.emoji-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.result-emoji {
+    font-size: 2.2rem;
+}
+
+.result-label {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.result-message {
+    font-family: var(--font-handwriting);
+    font-size: 1.3rem;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--accent-border);
+}
+
+/* 과거 마음 기록장 */
+.history-section {
+    background-color: var(--card-bg);
+    border: 2px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.btn-text {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--paper-texture);
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--accent-border);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.history-item:hover {
+    background-color: var(--accent-soft);
+    transform: translateX(2px);
+}
+
+.history-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.history-snippet {
+    font-size: 0.88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 320px;
+}
+
+.history-date {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+/* 푸터 */
+.footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    padding: 12px 0;
+}
+
+/* 유틸리티 클래스 */
+.hidden {
+    display: none !important;
+}
+
+/* ----------------------------------------------------------------------
+ * 3. 🔒 비밀번호 설정 및 인증 모달 (Modal System)
+ * ---------------------------------------------------------------------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.modal-card {
+    background-color: #ffffff;
+    border: 2px solid var(--accent-border);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 400px;
+    padding: 28px 24px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+    position: relative;
+    animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.modal-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.btn-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.modal-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.passcode-input-group {
+    margin-bottom: 14px;
+}
+
+.passcode-input-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: var(--text-secondary);
+}
+
+.passcode-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--accent-border);
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1.3rem;
+    letter-spacing: 6px;
+    outline: none;
+    font-family: var(--font-body);
+}
+
+.passcode-input.big {
+    font-size: 1.8rem;
+    padding: 14px;
+    letter-spacing: 12px;
+}
+
+.passcode-input:focus {
+    border-color: var(--accent-main);
+}
+
+.modal-status-msg {
+    font-size: 0.82rem;
+    margin-bottom: 14px;
+    text-align: center;
+    min-height: 20px;
+    font-weight: bold;
+}
+
+.modal-status-msg.error {
+    color: #ff4d4f;
+}
+
+.modal-status-msg.success {
+    color: #52c41a;
+}
+
+.modal-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-modal {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modal.btn-primary {
+    background-color: var(--accent-main);
+    color: #ffffff;
+}
+
+.btn-modal.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-modal.btn-secondary {
+    background-color: var(--paper-texture);
+    color: var(--text-primary);
+}
+
+.btn-modal.btn-danger {
+    background-color: #fff1f0;
+    color: #ff4d4f;
+    border: 1px solid #ffa39e;
+}
+
+.btn-modal.btn-danger:hover {
+    background-color: #ff4d4f;
+    color: #ffffff;
+}

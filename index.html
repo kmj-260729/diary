@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 감정일기장 - 📖 Canva 감성 아날로그 다이어리</title>
+
+    <!-- 구글 폰트: 감성적인 'Gowun Batang' & 'Gamja Flower' & 'Gowun Dodum' -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- 캐시 무효화 버전 9 번 적용 -->
+    <link rel="stylesheet" href="style.css?v=20260729_v9">
+
+    <!-- Firebase JS SDK (v10 호환 모듈 CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body data-theme="pink">
+    <div class="app-container">
+
+        <!-- ===================================================================
+             1. Canva 템플릿 감성 아날로그 커버 화면
+             =================================================================== -->
+        <div id="cover-screen" class="cover-screen">
+            
+            <!-- 다이어리 바인더 링 오브젝트 -->
+            <div class="binder-rings">
+                <span class="ring"></span>
+                <span class="ring"></span>
+                <span class="ring"></span>
+                <span class="ring"></span>
+                <span class="ring"></span>
+            </div>
+
+            <div class="cover-card">
+                <!-- 마스킹 테이프 장식 -->
+                <div class="tape-sticker tape-top-left"></div>
+                <div class="tape-sticker tape-top-right"></div>
+
+                <!-- 상단 파스텔 테마 스위처, 비밀번호 설정, DB 상태 -->
+                <div class="top-status-bar">
+                    <div class="theme-selector-bar">
+                        <span class="theme-label">🎨 테마:</span>
+                        <button type="button" class="btn-theme theme-pink active" onclick="setTheme('pink')" title="핑크 테마">💖 핑크</button>
+                        <button type="button" class="btn-theme theme-yellow" onclick="setTheme('yellow')" title="노랑 테마">💛 노랑</button>
+                        <button type="button" class="btn-theme theme-blue" onclick="setTheme('blue')" title="하늘색 테마">🩵 하늘</button>
+                    </div>
+
+                    <div class="top-right-tools">
+                        <button type="button" id="btn-passcode-toggle" class="btn-passcode-toggle" onclick="openPasscodeSetupModal()">
+                            🔒 비밀번호 설정하기
+                        </button>
+                        <span id="db-status-badge" class="db-status-badge">🔥 Firestore 연결 완료</span>
+                    </div>
+                </div>
+
+                <!-- 고양이 일러스트 레이아웃 -->
+                <div class="cat-illustration-wrapper">
+                    <img src="cat.png" alt="사용자 지정 고양이 일러스트" class="cat-illustration">
+                </div>
+
+                <!-- 감성 라벨 타이틀 -->
+                <div class="cover-ribbon" id="cover-ribbon-text">🌸 민지의 비밀 다이어리 🌸</div>
+
+                <!-- 사용자 이름 입력 영역 -->
+                <div class="name-input-group">
+                    <label for="user-name-input" class="name-label">✍️ 누구의 마음 일기장인가요?</label>
+                    <input 
+                        type="text" 
+                        id="user-name-input" 
+                        class="name-input" 
+                        placeholder="이름이나 별명을 입력해 보세요!" 
+                        maxlength="12"
+                        oninput="onNameChange()"
+                    >
+                </div>
+
+                <h1 class="cover-title">오늘 하루, 당신의 마음은 어땠나요?</h1>
+                <p class="cover-subtitle">달력에서 날짜를 고르고 포근한 다이어리를 펼쳐,<br>오늘 느꼈던 조용한 순간과 솔직한 감정을 적어보세요 🐾</p>
+
+                <!-- 일기장 열기 버튼 -->
+                <button type="button" class="btn-open-diary" onclick="handleOpenDiaryClick()">
+                    <span class="btn-icon">📖</span>
+                    <span id="btn-open-text">민지의 일기장 열기</span>
+                    <span class="paw-icon">🐾</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             2. Canva 감성 메인 다이어리 화면 (속지 노트 레이아웃)
+             =================================================================== -->
+        <div id="main-screen" class="main-screen hidden">
+
+            <!-- 바인더 스프링 디테일 -->
+            <div class="binder-rings inner">
+                <span class="ring"></span>
+                <span class="ring"></span>
+                <span class="ring"></span>
+                <span class="ring"></span>
+                <span class="ring"></span>
+            </div>
+
+            <!-- 상단 헤더 -->
+            <header class="header">
+                <div class="header-nav">
+                    <button type="button" class="btn-back-cover" onclick="closeDiary()">📕 일기장 덮기</button>
+                    
+                    <div class="theme-selector-bar mini">
+                        <button type="button" class="btn-theme theme-pink" onclick="setTheme('pink')">💖</button>
+                        <button type="button" class="btn-theme theme-yellow" onclick="setTheme('yellow')">💛</button>
+                        <button type="button" class="btn-theme theme-blue" onclick="setTheme('blue')">🩵</button>
+                    </div>
+
+                    <button type="button" class="btn-passcode-toggle mini" onclick="openPasscodeSetupModal()">
+                        🔒 비밀번호 설정
+                    </button>
+
+                    <span class="badge" id="main-badge-text">🌸 민지의 마음 다이어리</span>
+                </div>
+                <h1 class="main-title">오늘의 소중한 감정 기록하기</h1>
+                <p class="sub-title">오늘 느꼈던 감정과 솔직한 생각들을 적어보세요. Google Gemini AI가 다정하게 들어드릴게요.</p>
+            </header>
+
+            <main class="main-content">
+                
+                <!-- 📅 파스텔 마음 달력 카드 -->
+                <section class="calendar-card">
+                    <div class="tape-sticker tape-calendar"></div>
+                    <div class="calendar-header">
+                        <button type="button" class="btn-cal-nav" onclick="changeMonth(-1)" title="이전 달">◀</button>
+                        <h2 id="calendar-month-year" class="calendar-title">2026년 7월</h2>
+                        <button type="button" class="btn-cal-nav" onclick="changeMonth(1)" title="다음 달">▶</button>
+                        <button type="button" class="btn-today" onclick="selectToday()" title="오늘 날짜로 이동">오늘</button>
+                    </div>
+
+                    <!-- 요일 헤더 -->
+                    <div class="calendar-weekdays">
+                        <div class="weekday sun">일</div>
+                        <div class="weekday">월</div>
+                        <div class="weekday">화</div>
+                        <div class="weekday">수</div>
+                        <div class="weekday">목</div>
+                        <div class="weekday">금</div>
+                        <div class="weekday sat">토</div>
+                    </div>
+
+                    <!-- 날짜 그리드 -->
+                    <div id="calendar-days" class="calendar-days">
+                        <!-- 날짜들과 감정 이모지 스탬프 동적 생성 -->
+                    </div>
+                </section>
+
+                <!-- 선택된 날짜 안내 배너 -->
+                <div class="selected-date-banner">
+                    <span class="calendar-icon">📅</span>
+                    <span id="selected-date-text">2026년 7월 29일 (수요일) 일기 작성 중</span>
+                </div>
+
+                <!-- 일기 작성 노트 속지 카드 -->
+                <section class="diary-card">
+                    <div class="tape-sticker tape-note"></div>
+                    <div class="card-header">
+                        <label for="diary-input" class="input-label">✍️ 오늘의 일기 노트</label>
+                        <div class="header-right">
+                            <button type="button" class="btn-sample" onclick="fillSampleDiary()" title="테스트용 예시 글 채우기">
+                                🎲 예시 글 채우기
+                            </button>
+                            <span class="char-counter"><span id="char-count">0</span> / 1000자</span>
+                        </div>
+                    </div>
+
+                    <!-- 감성 일기 입력창 -->
+                    <textarea 
+                        id="diary-input" 
+                        placeholder="선택한 날짜에 어떤 일이 있었나요? 기뻤던 일, 늦잠 자서 속상했던 일, 마음속 고민까지 자유롭게 적어보세요..." 
+                        maxlength="1000"
+                        oninput="updateCharCount()"
+                    ></textarea>
+
+                    <!-- 음성 인식 상태 레이블 -->
+                    <div id="voice-status" class="voice-status hidden">
+                        <span class="pulse-ring"></span>
+                        <span id="voice-status-text">🎙️ 음성을 듣고 있어요... 편하게 말씀해 주세요.</span>
+                    </div>
+
+                    <!-- 버튼 영역 -->
+                    <div class="button-group">
+                        <button type="button" id="btn-voice" class="btn btn-voice" onclick="toggleVoiceInput()">
+                            <span class="btn-icon">🎙️</span>
+                            <span id="btn-voice-text">음성으로 입력하기</span>
+                        </button>
+                        <button type="button" id="btn-analyze" class="btn btn-analyze" onclick="requestAnalysis()">
+                            <span class="btn-icon">✨</span>
+                            <span>AI 감정 분석하기</span>
+                        </button>
+                    </div>
+
+                    <p class="voice-guide-tip">
+                        💡 <strong>음성 입력 가이드:</strong> <code>http://localhost:8080</code> 접속 환경에서 마이크 허용 시 말씀하시는 소리가 실시간 텍스트로 적힙니다.
+                    </p>
+                </section>
+
+                <!-- AI 답변 박스 -->
+                <section class="response-card">
+                    <div class="response-header">
+                        <h2 class="response-title">✨ Google Gemini AI의 다정한 편지</h2>
+                        <span id="sentiment-badge" class="sentiment-badge hidden">대표 감정</span>
+                    </div>
+
+                    <div id="ai-response-box" class="ai-response-box">
+                        <div id="ai-placeholder" class="ai-placeholder">
+                            <p class="placeholder-text">여기에 AI의 다정한 공감 답변이 표시됩니다.</p>
+                            <p class="placeholder-sub">일기를 적은 후 [✨ AI 감정 분석하기] 버튼을 누르면, 구글 Gemini AI가 당신을 위한 다정한 조언을 써 보내드려요.</p>
+                        </div>
+
+                        <!-- 로딩 상태 -->
+                        <div id="ai-loading" class="ai-loading hidden">
+                            <div class="loading-spinner"></div>
+                            <p class="loading-text">Google Gemini AI가 마음을 깊이 읽고 다정한 편지를 작성 중입니다...</p>
+                        </div>
+
+                        <!-- 분석 결과 표출 영역 -->
+                        <div id="ai-result" class="ai-result hidden">
+                            <div class="emoji-wrapper">
+                                <span id="result-emoji" class="result-emoji">😱</span>
+                                <span id="result-label" class="result-label">당황과 초조함</span>
+                            </div>
+                            <div class="message-wrapper">
+                                <p id="result-message" class="result-message"></p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 과거 마음 기록장 -->
+                <section class="history-section">
+                    <div class="history-header">
+                        <h3>📜 마음 기록장 (Firebase Firestore 실시간 저장)</h3>
+                        <button type="button" onclick="clearDiaryHistory()" class="btn-text">기록 비우기</button>
+                    </div>
+                    <div id="history-list" class="history-list">
+                        <!-- 동적 표출 -->
+                    </div>
+                </section>
+            </main>
+
+            <!-- 푸터 -->
+            <footer class="footer">
+                <p>© 📖 Canva 감성 AI 감정일기장 | Google Gemini AI & Firebase Firestore 연동</p>
+            </footer>
+        </div>
+
+    </div>
+
+    <!-- ===================================================================
+         3. 🔒 비밀번호 설정 / 변경 모달 창
+         =================================================================== -->
+    <div id="passcode-setup-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">🔒 비밀번호 잠금 설정</h3>
+                <button type="button" class="btn-modal-close" onclick="closePasscodeSetupModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">
+                    나만의 비밀 다이어리를 보호하기 위한 4자리 암호를 설정해 보세요.<br>
+                    설정 후에는 일기장을 열 때 암호를 입력해야 합니다.
+                </p>
+
+                <div class="passcode-input-group">
+                    <label for="setup-passcode-input">4자리 암호 입력</label>
+                    <input type="password" id="setup-passcode-input" class="passcode-input" placeholder="숫자 4자리" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+                </div>
+
+                <div class="passcode-input-group">
+                    <label for="confirm-passcode-input">암호 확인</label>
+                    <input type="password" id="confirm-passcode-input" class="passcode-input" placeholder="숫자 4자리 한번 더" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+                </div>
+
+                <div id="passcode-setup-msg" class="modal-status-msg"></div>
+
+                <div class="modal-btn-group">
+                    <button type="button" class="btn-modal btn-primary" onclick="savePasscode()">비밀번호 저장하기</button>
+                    <button type="button" id="btn-remove-passcode" class="btn-modal btn-danger hidden" onclick="removePasscode()">비밀번호 해제하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================
+         4. 🔑 일기장 열기 비밀번호 검증 모달 창
+         =================================================================== -->
+    <div id="passcode-auth-modal" class="modal-overlay hidden">
+        <div class="modal-card auth-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">🔑 비밀번호를 입력해 주세요</h3>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">이 일기장은 잠겨있습니다. 4자리 암호를 입력해주세요.</p>
+
+                <div class="passcode-input-group">
+                    <input type="password" id="auth-passcode-input" class="passcode-input big" placeholder="••••" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+                </div>
+
+                <div id="passcode-auth-msg" class="modal-status-msg error"></div>
+
+                <div class="modal-btn-group">
+                    <button type="button" class="btn-modal btn-primary" onclick="verifyPasscodeAndOpen()">일기장 열기</button>
+                    <button type="button" class="btn-modal btn-secondary" onclick="closePasscodeAuthModal()">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 자바스크립트 연결 (v9) -->
+    <script src="app.js?v=20260729_v9"></script>
+</body>
+</html>
